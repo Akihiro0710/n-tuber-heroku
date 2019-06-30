@@ -1,0 +1,124 @@
+@import "modaal";
+
+$base-font-color: #636b6f;
+$female-color: #f99;
+$male-color: #99f;
+$gender-color: #9f9;
+html, body {
+    color: $base-font-color;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 200;
+    height: 100vh;
+    margin: 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+.logo {
+    width: 100%;
+    max-width: 800px;
+    display: block;
+    margin: 0 auto;
+}
+
+.card-img-top {
+    object-fit: cover;
+}
+
+a {
+    &,
+    &:hover {
+        color: $base-font-color;
+        text-decoration: none !important;
+    }
+}
+
+.btn {
+    &-outline-female {
+        border-color: $female-color;
+        color: $female-color;
+
+        img {
+            height: 30px;
+        }
+
+        &:hover {
+            color: #fff;
+            background-color: $female-color;
+        }
+    }
+
+    &-state-female,
+    &-female {
+        background-color: $female-color;
+        color: darken($female-color, 30%);
+
+        img {
+            height: 30px;
+        }
+    }
+
+    &-female {
+        &:hover {
+            background-color: darken($female-color, 10%);
+            color: darken($female-color, 40%);
+        }
+    }
+
+    &-outline-male {
+        border-color: $male-color;
+        color: $male-color;
+
+        img {
+            height: 30px;
+        }
+
+        &:hover {
+            color: #fff;
+            background-color: $male-color;
+        }
+    }
+
+    &-state-male,
+    &-male {
+        background-color: $male-color;
+        color: darken($male-color, 30%);
+    }
+
+    &-male {
+        background-color: $male-color;
+        color: darken($male-color, 30%);
+
+        img {
+            height: 30px;
+        }
+
+        &:hover {
+            background-color: darken($male-color, 10%);
+            color: darken($male-color, 40%);
+        }
+    }
+
+    &-state-gender {
+        background-color: $gender-color;
+        color: darken($gender-color, 30%);
+    }
+
+    &-state {
+        &-female,
+        &-male,
+        &-gender {
+            img {
+                height: 18px;
+            }
+        }
+    }
+}
+
+.card-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
