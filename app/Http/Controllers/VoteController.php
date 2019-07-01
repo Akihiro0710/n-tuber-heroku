@@ -106,7 +106,6 @@ class VoteController extends Controller
             ]
         ];
         $comments = $commentsList[$answerVtuber['id']];
-        var_dump($comments);
         if ($rate < 30) {
             $comment = $comments[0];
         } elseif ($rate < 50) {
