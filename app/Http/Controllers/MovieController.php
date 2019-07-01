@@ -47,7 +47,7 @@ class MovieController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $movie = Movie::find($id)->toArray();
+        $movie = Movie::select(['id', 'vtuber_id', 'youtube_id', 'title'])->find($id)->toArray();
         $movie['gender'] = $this->answeredGender($request, $movie['vtuber_id']);
         $redirect_to = $request->query->get('redirect_to');
         return view('movies.show', compact('movie', 'redirect_to'));

@@ -17,18 +17,25 @@ class VoteController extends Controller
     public function index(Request $request)
     {
 
-        $user_id = $this->getCurrentUserId($request);
-        $votes = Vote::where('user_id', $user_id)->get()->toArray();
-        $vtubers = Vtuber::all()->toArray();
+        $votes = $this->getVotes($request)
+            ->get()->toArray();
+        $vtubers = Vtuber::select(['id', 'thumbnail', 'gender'])->get()->toArray();
         $answerVtuber = collect($vtubers)->random();
+        $success = 0;
+        foreach ($votes as $vote) {
+            foreach ($vtubers as $vtuber) {
+                if ($vtuber['id'] == $vote['vtuber_id']) {
+                    if ($vtuber['gender'] == $vote['gender']) {
+                        $success++;
+                    }
+                    break;
+                }
+            }
+        }
+        $total = count($votes);
+        $rate = $total === 0 ? 0 : $success * 100 / $total;
 
         $commentsList = [
-            2 => [
-                "うーん。見た目を信じすぎやねぇ",
-                "もう少しがんばらんなねー",
-                "中々すごいぜー？",
-                "おしい!あと少しやん!",
-                "あんた天才か!？"],
             1 => [
                 "残念",
                 "もう少しね",
@@ -36,19 +43,12 @@ class VoteController extends Controller
                 "おおすごい",
                 "天才が現れた…!",
             ],
-            5 => [
-                "本当に蛇の林檎を食したのか…？",
-                "まだまだ知恵が足りぬようだな",
-                "俺と並ぶに十万光年早いぞ未熟者",
-                "気に入った。貴様、名は何という？",
-                "まさか、この俺を超えただと…？"],
-            4 => [
-                "分かりづらかったですかね…ハードディスク",
-                "まずまず、ですね…",
-                "大分健闘されていますね",
-                "す、すごい…",
-                "最早神ですね!!!"
-            ],
+            2 => [
+                "うーん。見た目を信じすぎやねぇ",
+                "もう少しがんばらんなねー",
+                "中々すごいぜー？",
+                "おしい!あと少しやん!",
+                "あんた天才か!？"],
             3 => [
                 "…あ？あスンマセンこたろーに夢中で見てませんでした",
                 "ふ〜ん。ダメダメっすね",
@@ -56,6 +56,19 @@ class VoteController extends Controller
                 "おーすっげー",
                 "神すげえ！！"
             ],
+            4 => [
+                "分かりづらかったですかね…ハードディスク",
+                "まずまず、ですね…",
+                "大分健闘されていますね",
+                "す、すごい…",
+                "最早神ですね!!!"
+            ],
+            5 => [
+                "本当に蛇の林檎を食したのか…？",
+                "まだまだ知恵が足りぬようだな",
+                "俺と並ぶに十万光年早いぞ未熟者",
+                "気に入った。貴様、名は何という？",
+                "まさか、この俺を超えただと…？"],
             6 => [
                 "今の一句「まだだめだ　もすこし勉強　がんばって」",
                 "今の一句「もう少し　歩くなメロス　走るんだ」",
@@ -92,33 +105,18 @@ class VoteController extends Controller
                 "私と一緒に社会の闇を暴きましょう！"
             ]
         ];
-        $success = 0;
-        $fail = 0;
-        foreach ($vtubers as $vtuber) {
-            foreach ($votes as $vote) {
-                if ($vtuber['id'] == $vote['vtuber_id']) {
-                    if ($vtuber['gender'] == $vote['gender']) {
-                        $success++;
-                    } else {
-                        $fail++;
-                    }
-                    break;
-                }
-            }
-        }
-        $total = $success + $fail;
-        $rate = $success * 100 / $total;
         $comments = $commentsList[$answerVtuber['id']];
+        var_dump($comments);
         if ($rate < 30) {
-            $comment = $comments[4];
-        } elseif ($rate < 5080) {
-            $comment = $comments[3];
+            $comment = $comments[0];
+        } elseif ($rate < 50) {
+            $comment = $comments[1];
         } elseif ($rate < 80) {
             $comment = $comments[2];
         } elseif ($rate < 100) {
-            $comment = $comments[1];
+            $comment = $comments[3];
         } else {
-            $comment = $comments[0];
+            $comment = $comments[4];
         }
         $rate = intval($rate);
         $request->session()->pull('id');
@@ -157,12 +155,12 @@ class VoteController extends Controller
     public function show(Request $request, $vtuber_id)
     {
         $user_id = $this->getCurrentUserId($request);
-        $vote = Vote::where('vtuber_id', $vtuber_id)->where('user_id', $user_id)->first();
+        $vote = $this->getVotes($request)->where('vtuber_id', $vtuber_id)->first();
         $gender = $request->query->get('gender');
         if (is_null($vote)) {
             $vote = new Vote();
             $vote->create(compact('vtuber_id', 'user_id', 'gender'));
-        } else {
+        } else if ($vote->gender != $gender) {
             $vote->fill(compact('gender'));
             $vote->save();
         }

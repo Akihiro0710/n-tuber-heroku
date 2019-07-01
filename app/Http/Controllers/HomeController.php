@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\Vtuber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -14,7 +16,19 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $movies = collect(Movie::all()->toArray())->random(6);
+        $movies = DB::table('movies AS m1')
+            ->leftjoin('movies AS m2', function ($join) {
+                $join->on('m1.vtuber_id', '=', 'm2.vtuber_id');
+                $join->on('m1.id', '<', 'm2.id');
+            })->whereNull('m2.id')
+            ->select('m1.id', 'm1.youtube_id', 'm1.vtuber_id', 'm1.title')
+            ->inRandomOrder()
+            ->limit(6)
+            ->get()
+            ->map(function ($item) {
+                return (array)$item;
+            })
+            ->toArray();
         return view('index', compact('movies'));
     }
 

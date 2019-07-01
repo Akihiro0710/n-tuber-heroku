@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
-use App\Models\Vote;
 use App\Models\Vtuber;
 use Illuminate\Http\Request;
 
@@ -17,19 +16,20 @@ class VtuberController extends Controller
      */
     public function index(Request $request)
     {
-        $data = Vtuber::all()->toArray();
-        $vtubers = [];
-        $valid = true;
-
-        foreach ($data as $item) {
-            $gender = $this->answeredGender($request, $item['id']);
-            if ($gender < 0) {
-                $valid = false;
+        $vtubers = Vtuber::select(['id', 'thumbnail', 'name'])->get()->toArray();
+        $votes = $this->getVotes($request)
+            ->get()
+            ->toArray();
+        foreach ($vtubers as $i => $vtuber) {
+            $vtubers[$i]['gender'] = -1;
+            foreach ($votes as $vote) {
+                if ($vtuber['id'] == $vote['vtuber_id']) {
+                    $vtuber[$i]['gender'] = intval($vote['gender']);
+                    break;
+                }
             }
-            $item['gender'] = $gender;
-            $vtubers[] = $item;
         }
-        return view('vtubers.index', compact('vtubers', 'valid'));
+        return view('vtubers.index', compact('vtubers'));
     }
 
     /**
@@ -63,7 +63,7 @@ class VtuberController extends Controller
     public function show(Request $request, $id)
     {
         $vtuber = Vtuber::find($id);
-        $movies = Movie::where('vtuber_id', $id)->get()->toArray();
+        $movies = $vtuber->movies()->select(['id', 'youtube_id', 'title'])->get()->toArray();
         if ($vtuber == null) {
             abort('404');
         }

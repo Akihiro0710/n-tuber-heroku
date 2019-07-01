@@ -13,6 +13,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    protected function getVotes($request)
+    {
+        return Vote::where('user_id', $this->getCurrentUserId($request))
+            ->select(['vtuber_id', 'gender']);
+    }
+
     protected function getCurrentUserId(Request $request)
     {
         $user_id = $request->session()->get('id');
@@ -27,8 +33,9 @@ class Controller extends BaseController
 
     protected function answeredGender(Request $request, $vtuber_id)
     {
-        $user_id = $this->getCurrentUserId($request);
-        $vote = Vote::where('vtuber_id', $vtuber_id)->where('user_id', $user_id)->first();
+        $vote = $this->getVotes($request)
+            ->where('vtuber_id', $vtuber_id)
+            ->first();
         if (is_null($vote)) {
             return -1;
         }

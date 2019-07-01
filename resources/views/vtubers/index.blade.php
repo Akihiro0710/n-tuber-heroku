@@ -1,13 +1,8 @@
 @extends('layouts.index')
 @section('main')
     <div class="container">
-        <div class="row" style="margin-bottom: 32px">
-            <div class="offset-4"></div>
-            <div class="col-4">
-                <a href="{{route('votes.index')}}" class="btn btn-lg btn-success btn-block">答え合わせ</a>
-            </div>
-            <div class="offset-4"></div>
-        </div>
+        @component('components.vote_button')
+        @endcomponent
         <div class="row">
             @foreach($vtubers as $vtuber)
                 <div class="col-3" style="margin-bottom: 32px">

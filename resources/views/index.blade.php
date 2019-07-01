@@ -12,5 +12,7 @@
                 </div>
             @endforeach
         </div>
+        @component('components.vote_button')
+        @endcomponent
     </div>
 @endsection

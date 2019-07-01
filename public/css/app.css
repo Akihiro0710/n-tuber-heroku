@@ -717,4 +717,7 @@ a, a:hover {
   text-overflow: ellipsis;
   white-space: nowrap; }
 
+.row {
+  margin-bottom: 32px; }
+
 /*# sourceMappingURL=app.css.map */
