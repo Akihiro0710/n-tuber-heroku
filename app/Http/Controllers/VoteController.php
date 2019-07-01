@@ -120,7 +120,7 @@ class VoteController extends Controller
         $rate = intval($rate);
         $request->session()->pull('id');
         $image = $answerVtuber['thumbnail'];
-        return view('votes.index', compact('success', 'fail', 'rate', 'image', 'comment'));
+        return view('votes.index', compact('success', 'rate', 'image', 'comment'));
     }
 
     /**
